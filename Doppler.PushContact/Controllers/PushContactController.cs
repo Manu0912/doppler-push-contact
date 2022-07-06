@@ -132,5 +132,19 @@ namespace Doppler.PushContact.Controllers
                 messageDetails.NotDelivered
             });
         }
+
+        [HttpGet]
+        [Route("push-contacts/domains")]
+        public async Task<IEnumerable<DomainReport>> GetDomains()
+        {
+            throw new NotImplementedException();
+        }
+
+        [HttpGet]
+        [Route("push-contacts/messages/details")]
+        public async Task<IEnumerable<MessageReport>> GetMessages([FromQuery] DateTime from, [FromQuery] DateTime to)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
