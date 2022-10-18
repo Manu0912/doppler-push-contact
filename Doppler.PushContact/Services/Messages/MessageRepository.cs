@@ -74,7 +74,7 @@ namespace Doppler.PushContact.Services.Messages
             }
         }
 
-        public async Task<MessageDetails> GetMessageDetailsAsync(string domain, Guid messageId)
+        public async Task<MessageDetails> GetMessageDetailsAsync(string domain, Guid messageId, int sent, int delivered, int notDelivered)
         {
             var filterBuilder = Builders<BsonDocument>.Filter;
 
@@ -93,9 +93,9 @@ namespace Doppler.PushContact.Services.Messages
                     Title = message.GetValue(MessageDocumentProps.TitlePropName).AsString,
                     Body = message.GetValue(MessageDocumentProps.BodyPropName).AsString,
                     OnClickLinkPropName = message.GetValue(MessageDocumentProps.OnClickLinkPropName) == BsonNull.Value ? null : message.GetValue(MessageDocumentProps.OnClickLinkPropName).AsString,
-                    Sent = message.GetValue(MessageDocumentProps.SentPropName).AsInt32,
-                    Delivered = message.GetValue(MessageDocumentProps.DeliveredPropName).AsInt32,
-                    NotDelivered = message.GetValue(MessageDocumentProps.NotDeliveredPropName).AsInt32,
+                    Sent = sent,
+                    Delivered = delivered,
+                    NotDelivered = notDelivered,
                     ImageUrl = message.GetValue(MessageDocumentProps.OnClickLinkPropName) == BsonNull.Value ? null : message.GetValue(MessageDocumentProps.ImageUrlPropName).AsString
                 };
             }
