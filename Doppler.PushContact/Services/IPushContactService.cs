@@ -27,6 +27,8 @@ namespace Doppler.PushContact.Services
 
         Task<ApiPage<DomainInfo>> GetDomains(int page, int per_page);
 
+        Task<MessageDeliveryResult> GetHistoryEventResultByMessageIdAsync(string domain, Guid messageId);
+
         Task UpdatePushContactVisitorGuid(string deviceToken, string visitorGuid);
 
         Task<ApiPage<string>> GetAllVisitorGuidByDomain(string domain, int page, int per_page);
