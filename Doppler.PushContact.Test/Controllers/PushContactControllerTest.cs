@@ -2875,5 +2875,95 @@ namespace Doppler.PushContact.Test.Controllers
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
+        [Theory]
+        [InlineData(TestApiUsersData.TOKEN_SUPERUSER_EXPIRE_20010908, "exampleVisitorGuid")]
+        public async Task HasPushNotificationEnabledByVisitorGuid_should_return_unauthorized_when_token_is_a_expired_superuser_token(string token, string visitorGuid)
+        {
+            // Arrange
+            var client = _factory.CreateClient(new WebApplicationFactoryClientOptions());
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"push-contacts/{visitorGuid}")
+            {
+                Headers = { { "Authorization", $"Bearer {token}" } }
+            };
+
+            // Act
+            var response = await client.SendAsync(request);
+            _output.WriteLine(response.GetHeadersAsString());
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(TestApiUsersData.TOKEN_EXPIRE_20330518, "exampleVisitorGuid")]
+        [InlineData(TestApiUsersData.TOKEN_SUPERUSER_FALSE_EXPIRE_20330518, "exampleVisitorGuid")]
+        [InlineData(TestApiUsersData.TOKEN_ACCOUNT_123_TEST1_AT_TEST_DOT_COM_EXPIRE_20330518, "exampleVisitorGuid")]
+        public async Task HasPushNotificationEnabledByVisitorGuid_should_require_a_valid_token_with_isSU_flag(string token, string visitorGuid)
+        {
+            // Arrange
+            var client = _factory.CreateClient(new WebApplicationFactoryClientOptions());
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"push-contacts/{visitorGuid}")
+            {
+                Headers = { { "Authorization", $"Bearer {token}" } }
+            };
+
+            // Act
+            var response = await client.SendAsync(request);
+            _output.WriteLine(response.GetHeadersAsString());
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        [Theory]
+        [InlineData("exampleVisitorGuid")]
+        public async Task HasPushNotificationEnabledByVisitorGuid_should_return_unauthorized_when_authorization_header_is_empty(string visitorGuid)
+        {
+            // Arrange
+            var client = _factory.CreateClient(new WebApplicationFactoryClientOptions());
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"push-contacts/{visitorGuid}");
+
+            // Act
+            var response = await client.SendAsync(request);
+            _output.WriteLine(response.GetHeadersAsString());
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(" ")]
+        public async Task HasPushNotificationEnabledByVisitorGuid_should_throw_bad_request_when_visitorGuid_is_whitespace(string visitorGuid)
+        {
+            // Arrange
+            var pushContactServiceMock = new Mock<IPushContactService>();
+            var messageRepositoryMock = new Mock<IMessageRepository>();
+
+            var client = _factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureTestServices(services =>
+                {
+                    services.AddSingleton(pushContactServiceMock.Object);
+                    services.AddSingleton(messageRepositoryMock.Object);
+                });
+
+            }).CreateClient(new WebApplicationFactoryClientOptions());
+
+            var url = $"push-contacts/{visitorGuid}";
+            var request = new HttpRequestMessage(HttpMethod.Get, url)
+            {
+                Headers = { { "Authorization", $"Bearer {TestApiUsersData.TOKEN_SUPERUSER_EXPIRE_20330518}" } }
+            };
+
+            // Act
+            var response = await client.SendAsync(request);
+            _output.WriteLine(response.GetHeadersAsString());
+
+            // Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
     }
 }
