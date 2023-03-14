@@ -565,6 +565,27 @@ with {nameof(deviceToken)} {deviceToken}. {PushContactDocumentProps.EmailPropNam
             }
         }
 
+        public async Task<bool> HasPushNotificationEnabledByVisitorGuid(string visitorGuid)
+        {
+            var filterBuilder = Builders<BsonDocument>.Filter;
+            var filter = filterBuilder.Eq(PushContactDocumentProps.VisitorGuidPropName, visitorGuid)
+                & filterBuilder.Eq(PushContactDocumentProps.DeletedPropName, false);
+
+            try
+            {
+                var pushContactsFiltered = await (await PushContacts.FindAsync(filter)).ToListAsync();
+
+                return pushContactsFiltered.Any();
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, $"Error getting active {nameof(PushContactModel)}s by {nameof(visitorGuid)} {visitorGuid}");
+
+                throw new Exception($"Error getting active {nameof(PushContactModel)}s by {nameof(visitorGuid)} {visitorGuid}", ex);
+            }
+            
+        }
+
         private IMongoCollection<BsonDocument> PushContacts
         {
             get

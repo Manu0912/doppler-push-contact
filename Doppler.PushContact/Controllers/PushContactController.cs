@@ -200,6 +200,20 @@ namespace Doppler.PushContact.Controllers
         }
 
         [HttpGet]
+        [Route("push-contacts/{visitorGuid}")]
+        public async Task<IActionResult> HasPushNotificationEnabledByVisitorGuid([FromRoute] string visitorGuid)
+        {
+            if (string.IsNullOrEmpty(visitorGuid) || string.IsNullOrWhiteSpace(visitorGuid))
+            {
+                return BadRequest($"'{nameof(visitorGuid)}' cannot be null, empty or whitespace.");
+            }
+
+            var hasPushNotificationEnabled = await _pushContactService.HasPushNotificationEnabledByVisitorGuid(visitorGuid);
+
+            return Ok(hasPushNotificationEnabled);
+        }
+
+        [HttpGet]
         [Route("push-contacts/messages/delivery-results")]
         public async Task<ActionResult<ApiPage<MessageDeliveryResult>>> GetMessages([FromQuery] int page, [FromQuery] int per_page, [FromQuery] DateTimeOffset from, [FromQuery] DateTimeOffset to)
         {
