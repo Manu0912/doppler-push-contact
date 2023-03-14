@@ -32,5 +32,7 @@ namespace Doppler.PushContact.Services
         Task UpdatePushContactVisitorGuid(string deviceToken, string visitorGuid);
 
         Task<ApiPage<string>> GetAllVisitorGuidByDomain(string domain, int page, int per_page);
+
+        Task<bool> GetEnabledByVisitorGuid(string domain, string visitorGuid);
     }
 }
